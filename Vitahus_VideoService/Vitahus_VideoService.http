@@ -1,0 +1,6 @@
+@Vitahus_VideoService_HostAddress = http://localhost:5162
+
+GET {{Vitahus_VideoService_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
