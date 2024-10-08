@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace Vitahus_VideoService_Shared;
 
-public class Video
+public class Video : BaseEntity
 {
     [JsonPropertyName("Url")]
     [StringLength(

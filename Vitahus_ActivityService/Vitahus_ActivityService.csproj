@@ -8,7 +8,28 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.8"/>
+        <PackageReference Include="Serilog" Version="4.1.0-dev-02238" />
+        <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="AutoMapper">
+        <HintPath>..\..\..\..\.nuget\packages\automapper\13.0.1\lib\net6.0\AutoMapper.dll</HintPath>
+      </Reference>
+      <Reference Include="MongoDB.Bson">
+        <HintPath>..\..\..\..\.nuget\packages\mongodb.bson\2.29.0\lib\netstandard2.1\MongoDB.Bson.dll</HintPath>
+      </Reference>
+      <Reference Include="MongoDB.Driver">
+        <HintPath>..\..\..\..\.nuget\packages\mongodb.driver\2.29.0\lib\netstandard2.1\MongoDB.Driver.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Vitahus_ActivityService_Data\Vitahus_ActivityService_Data.csproj" />
+      <ProjectReference Include="..\Vitahus_ActivityService_Shared\Vitahus_ActivityService_Shared.csproj" />
+      <ProjectReference Include="..\Vitahus_ActivityService_Repository\Vitahus_ActivityService_Repository.csproj" />
+      <ProjectReference Include="..\Vitahus_ActivityService_Service\Vitahus_ActivityService_Service.csproj" />
     </ItemGroup>
 
 </Project>

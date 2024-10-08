@@ -1,9 +1,8 @@
-﻿using System.Diagnostics;
-using Microsoft.Extensions.Logging;
+using System.Diagnostics;
 using MongoDB.Driver;
+using Microsoft.Extensions.Logging;
 
-namespace Vitahus_VideoService_Repository;
-
+namespace Vitahus_ActivityService_Repository;
 public class GenericRepository<T>(IMongoDatabase database, ILogger<GenericRepository<T>> logger)
     : IGenericRepository<T> where T : class
 {
@@ -132,23 +131,33 @@ public class GenericRepository<T>(IMongoDatabase database, ILogger<GenericReposi
         var stopwatch = Stopwatch.StartNew();
         if (id == Guid.Empty)
         {
-            throw new ArgumentNullException(nameof(id), "Id is empty - cannot delete entity");
+            throw new ArgumentNullException(nameof(id), "Id er tom - kan ikke slette entitet");
         }
 
         try
         {
-            await _collection.DeleteOneAsync(Builders<T>.Filter.Eq("_id", id));
+            var result = await _collection.DeleteOneAsync(Builders<T>.Filter.Eq("_id", id));
+            if (result.DeletedCount == 0)
+            {
+                logger.LogWarning("Ingen entitet fundet med id {Id} til sletning", id);
+                throw new KeyNotFoundException($"Ingen entitet fundet med id {id}");
+            }
+        }
+        catch (MongoException e)
+        {
+            logger.LogError(e, "Fejl ved sletning af entitet fra samlingen");
+            throw;
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Error deleting entity from the collection");
+            logger.LogError(e, "Uventet fejl ved sletning af entitet");
             throw;
         }
         finally
         {
             stopwatch.Stop();
             logger.LogInformation(
-                "DeleteAsync took {ElapsedMilliseconds} ms ",
+                "DeleteAsync tog {ElapsedMilliseconds} ms ",
                 stopwatch.ElapsedMilliseconds
             );
         }

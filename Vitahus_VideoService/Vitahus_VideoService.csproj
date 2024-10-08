@@ -6,13 +6,24 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include ="..\Vitahus_VideoService_Services\Vitahus_VideoService_Services.csproj" />
-  </ItemGroup>
+
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="13.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.8" />
+    <PackageReference Include="MongoDB.Bson" Version="2.29.0" />
+    <PackageReference Include="MongoDB.Driver" Version="2.29.0" />
+    <PackageReference Include="Serilog" Version="4.1.0-dev-02238" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+  </ItemGroup>
+
+
+
+  <ItemGroup>
+    <ProjectReference Include="..\Vitahus_VideoService_Data\Vitahus_VideoService_Data.csproj" />
+    <ProjectReference Include="..\Vitahus_VideoService_Repository\Vitahus_VideoService_Repository.csproj" />
+    <ProjectReference Include="..\Vitahus_VideoService_Service\Vitahus_VideoService_Service.csproj" />
   </ItemGroup>
 
 

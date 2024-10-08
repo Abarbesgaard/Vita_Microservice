@@ -1,10 +1,13 @@
+using Vitahus_VideoService_Shared;
+
 namespace Vitahus_VideoService_Service;
 
 public interface IVideoService
 {
-    Task<IEnumerable<Video>> GetVideos();
-    Task<Video> GetVideo(int id);
-    Task AddVideo(Video video);
-    Task UpdateVideo(Video video);
-    Task DeleteVideo(Video video);
+    Task<Video?> GetVideoAsync(Guid videoId);
+    Task<IEnumerable<Video>> GetVideosAsync();
+    Task AddVideoAsync(Video video);
+    Task UpdateVideoAsync(Video video);
+    
+    Task DeleteVideoAsync(Video? video);
 }

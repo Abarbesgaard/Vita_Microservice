@@ -5,5 +5,22 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\Vitahus_VideoService_Repository\Vitahus_VideoService_Repository.csproj" />
+    <ProjectReference Include="..\Vitahus_VideoService_Shared\Vitahus_VideoService_Shared.csproj" />
+  </ItemGroup>
+  
 
+  <ItemGroup>
+    <PackageReference Include="MongoDB.Driver.Core" Version="2.29.0" />
+  </ItemGroup>
+  
+
+  <ItemGroup>
+    <Reference Include="MongoDB.Driver">
+      <HintPath>..\..\..\..\.nuget\packages\mongodb.driver\2.29.0\lib\netstandard2.1\MongoDB.Driver.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  
 </Project>

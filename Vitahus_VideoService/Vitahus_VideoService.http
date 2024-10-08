@@ -1,6 +1,30 @@
-@Vitahus_VideoService_HostAddress = http://localhost:5162
+@Vitahus_VideoService_HostAddress = https://localhost:5001
 
-GET {{Vitahus_VideoService_HostAddress}}/weatherforecast/
+GET {{Vitahus_VideoService_HostAddress}}/api/video/getallvideos
 Accept: application/json
 
 ###
+@Vitahus_Video1_Id = 7b6f653b-b326-46d9-be59-8cad8aee15a4
+GET {{Vitahus_VideoService_HostAddress}}/api/video/get/{{Vitahus_Video1_Id}}
+
+###
+
+POST {{Vitahus_VideoService_HostAddress}}/api/video/create
+Content-Type: application/json
+
+{
+  "title": "Video 1",
+  "description": "Video 1 Description",
+  "url": "https://www.youtube.com/watch?v=1"
+}
+
+###
+
+PUT {{Vitahus_VideoService_HostAddress}}/api/video/update/{{Vitahus_Video1_Id}}
+Content-Type: application/json
+
+{
+  "title": "Video 1 Updated",
+  "description": "Video 1 Description Updated",
+  "url": "https://www.youtube.com/watch?v=1"
+}

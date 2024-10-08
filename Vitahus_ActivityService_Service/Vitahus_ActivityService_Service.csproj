@@ -6,4 +6,15 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Vitahus_ActivityService_Shared\Vitahus_ActivityService_Shared.csproj" />
+      <ProjectReference Include="..\Vitahus_ActivityService_Repository\Vitahus_ActivityService_Repository.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="AutoMapper">
+        <HintPath>..\..\..\..\.nuget\packages\automapper\13.0.1\lib\net6.0\AutoMapper.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
 </Project>

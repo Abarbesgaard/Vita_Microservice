@@ -1,87 +1,74 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Components.Forms.Mapping;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Vitahus_VideoService_Service;
+using Vitahus_VideoService_Shared;
 
-namespace Vitahus_VideoService.Controllers
-{
+namespace Vitahus_VideoService.Controller;
+
     [Route("api/[controller]")]
     [ApiController]
     public class VideoController(
-        IVideoService _videoService,
-        ILogger<VideoController> _logger,
-        IWebHostEnvironment _env,
+        IVideoService videoService,
+        ILogger<VideoController> logger,
+        IWebHostEnvironment env,
         IMapper? mapper) 
         : ControllerBase
     {
-        private readonly IVideoService _videoService;
-
-        public VideoController(IVideoService videoService)
-        {
-            _videoService = videoService;
-        }
-
+       
         // GET: api/Video
         [HttpGet]
+        [Route("GetAllVideos")]
         public async Task<ActionResult<IEnumerable<Video>>> GetVideos()
         {
-            return Ok(await _videoService.GetVideos());
+            if (env.IsDevelopment())
+            {
+            logger.LogInformation("Getting all videos");
+            return Ok(await videoService.GetVideosAsync());
+            }
+
+            return BadRequest("Unauthorized");
         }
 
-        // GET: api/Video/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Video>> GetVideo(int id)
+        [HttpGet("get/{id:guid}")]
+        public async Task<ActionResult<Video>> GetVideo(Guid id)
         {
-            var video = await _videoService.GetVideo(id);
-
-            if (video == null)
-            {
-                return NotFound();
-            }
+            logger.LogInformation("Fetching video with ID: {Id}", id); 
+            var video = await videoService.GetVideoAsync(id);
 
             return Ok(video);
         }
 
-        // POST: api/Video
         [HttpPost]
+        [Route("create")]
         public async Task<ActionResult<Video>> PostVideo(Video video)
         {
-            await _videoService.AddVideo(video);
+            await videoService.AddVideoAsync(video);
 
             return CreatedAtAction("GetVideo", new { id = video.Id }, video);
         }
 
         // PUT: api/Video/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutVideo(int id, Video video)
+        [HttpPut("/update/{id:guid}")]
+        public async Task<IActionResult> PutVideo(Guid id, Video video)
         {
             if (id != video.Id)
             {
                 return BadRequest();
             }
 
-            await _videoService.UpdateVideo(video);
+            await videoService.UpdateVideoAsync(video);
 
             return NoContent();
         }
 
         // DELETE: api/Video/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteVideo(int id)
+        [HttpDelete("/delete/{id:guid}")]
+        public async Task<IActionResult> DeleteVideo(Guid id)
         {
-            var video = await _videoService.GetVideo(id);
-            if (video == null)
-            {
-                return NotFound();
-            }
+            var video = await videoService.GetVideoAsync(id);
 
-            await _videoService.DeleteVideo(video);
+            await videoService.DeleteVideoAsync(video);
 
             return NoContent();
         }
     }
-}
