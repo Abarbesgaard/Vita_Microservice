@@ -1,0 +1,6 @@
+@Vitahus_ActivityService_HostAddress = http://localhost:5172
+
+GET {{Vitahus_ActivityService_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
