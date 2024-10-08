@@ -14,6 +14,7 @@ public class GenericRepository<T>(IMongoDatabase database, ILogger<GenericReposi
     public async Task<IReadOnlyCollection<T>> GetAllAsync()
     {
         var stopwatch = Stopwatch.StartNew();
+        logger.LogInformation("Getting all entities from the collection");
         try
         {
             return await _collection.Find(FilterDefinition<T>.Empty).ToListAsync();
@@ -36,6 +37,7 @@ public class GenericRepository<T>(IMongoDatabase database, ILogger<GenericReposi
     public async Task<T?> GetByIdAsync(Guid id)
     {
         var stopwatch = Stopwatch.StartNew();
+        logger.LogInformation("Getting entity by ID: {Id}", id);
         if (id == Guid.Empty)
         {
             throw new ArgumentNullException(nameof(id), "Id is empty - cannot get entity");
@@ -63,6 +65,7 @@ public class GenericRepository<T>(IMongoDatabase database, ILogger<GenericReposi
     public async Task? CreateAsync(T entity)
     {
         var stopwatch = Stopwatch.StartNew();
+        logger.LogInformation("Creating entity");
         if (entity == null)
         {
             logger.LogError($"Entity is null - cannot create {nameof(entity)}");
@@ -94,6 +97,7 @@ public class GenericRepository<T>(IMongoDatabase database, ILogger<GenericReposi
     public async Task UpdateAsync(Guid id, T entity)
     {
         var stopwatch = Stopwatch.StartNew();
+        logger.LogInformation("Updating entity with ID: {Id}", id);
         if (id == Guid.Empty)
         {
             throw new ArgumentNullException(nameof(id), "Id is  empty - cannot update entity");
@@ -129,6 +133,7 @@ public class GenericRepository<T>(IMongoDatabase database, ILogger<GenericReposi
     public async Task DeleteAsync(Guid id)
     {
         var stopwatch = Stopwatch.StartNew();
+        logger.LogInformation("Deleting entity with ID: {Id}", id);
         if (id == Guid.Empty)
         {
             throw new ArgumentNullException(nameof(id), "Id er tom - kan ikke slette entitet");

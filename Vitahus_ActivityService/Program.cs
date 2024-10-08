@@ -31,7 +31,9 @@ public static class Program
         builder.Services.AddSingleton(mapper);
         
         builder.Services.AddControllers(options => { options.SuppressAsyncSuffixInActionNames = false; });
+
         var mongoDbSettingsSection = builder.Configuration.GetSection("MongoDbSettings");
+        
         builder.Services.Configure<MongoDbSettings>(mongoDbSettingsSection);
         
         builder.Services.AddSingleton<IMongoClient>(serviceProvider =>
@@ -50,7 +52,7 @@ public static class Program
         builder.Services.AddSingleton(serviceProvider =>
         {
             var database = serviceProvider.GetRequiredService<IMongoDatabase>();
-            return database.GetCollection<AuditLog>("AuditLogs");  // Ensure this matches your collection name
+            return database.GetCollection<AuditLog>("AuditLogs");  
         });
         
         builder.Services.AddCors(options =>
