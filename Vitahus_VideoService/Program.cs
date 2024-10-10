@@ -11,6 +11,8 @@ using Vitahus_VideoService_Repository;
 using Vitahus_VideoService_Service;
 using Vitahus_VideoService_Shared;
 using Vitahus_VideoService.Mapping;
+using Vitahus_VideoService_Service.RabbitMQ;
+using RabbitMQ.Client;
 
 namespace Vitahus_VideoService;
 
@@ -76,9 +78,19 @@ public static class Program
         builder.Services.AddSingleton(typeof(IGenericRepository<>), typeof(GenericRepository<>));
         builder.Services.AddSingleton<IVideoService, VideoService>();
         builder.Services.AddSingleton<IAuditLogService, AuditLogService>();
-        
-         builder.Services.AddEndpointsApiExplorer();
-         builder.Services.AddSwaggerGen( options =>
+        builder.Services.AddSingleton<IConnectionFactory>(sp => 
+        new ConnectionFactory() 
+            { 
+           HostName = "localhost", // eller din RabbitMQ server adresse
+           UserName = "guest", // eller dit brugernavn
+           Password = "guest"  // eller din adgangskode
+            });
+        builder.Services.AddSingleton<IRabbitMQService, RabbitMQService>();
+
+        builder.Services.AddHostedService<VideoConsumer>();
+        builder.Services.AddHostedService<AuditLogConsumer>();
+        builder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddSwaggerGen( options =>
          {
              options.SwaggerDoc("v1", new OpenApiInfo { Title = "Vitahus_VideoService", Version = "v1" });
          });

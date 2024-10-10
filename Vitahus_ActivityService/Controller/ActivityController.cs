@@ -24,6 +24,7 @@ public class ActivityController(
     {
         logger.LogInformation("Getting all activities");
         var activities = await _activityService.GetAllAsync();
+        logger.LogInformation("Activities: {Activities}", activities);  
         return Ok(activities);
     }
 
@@ -32,6 +33,7 @@ public class ActivityController(
     {
         logger.LogInformation("Getting activity by ID: {Id}", id);
         var activity = await _activityService.GetByIdAsync(id);
+        logger.LogInformation("Activity: {Activity}", activity);
         return Ok(activity);
     }
 
@@ -40,6 +42,7 @@ public class ActivityController(
     {
         logger.LogInformation("Updating activity with ID: {Id}", id);
         var updatedActivity = await _activityService.UpdateActivityAsync(id, activity);
+        logger.LogInformation("Updated activity: {UpdatedActivity}", updatedActivity);
         return Ok(updatedActivity);
     }
 
@@ -48,6 +51,7 @@ public class ActivityController(
     {
         logger.LogInformation("Deleting activity with ID: {Id}", id);
         await _activityService.DeleteActivityAsync(id);
+        logger.LogInformation("Activity deleted successfully");
         return NoContent();
     }
 }

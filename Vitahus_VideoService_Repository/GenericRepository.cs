@@ -21,14 +21,14 @@ public class GenericRepository<T>(IMongoDatabase database, ILogger<GenericReposi
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Error getting all entities from the collection");
+            logger.LogError(e, "Error getting all entities from the collection\n");
             throw;
         }
         finally
         {
             stopwatch.Stop();
             logger.LogInformation(
-                "GetAllAsync took {ElapsedMilliseconds} ms ",
+                "GetAllAsync took {ElapsedMilliseconds} ms \n",
                 stopwatch.ElapsedMilliseconds
             );
         }
@@ -39,7 +39,7 @@ public class GenericRepository<T>(IMongoDatabase database, ILogger<GenericReposi
         var stopwatch = Stopwatch.StartNew();
         if (id == Guid.Empty)
         {
-            throw new ArgumentNullException(nameof(id), "Id is empty - cannot get entity");
+            throw new ArgumentNullException(nameof(id), "Id is empty - cannot get entity\n");
         }
 
         try
@@ -48,14 +48,14 @@ public class GenericRepository<T>(IMongoDatabase database, ILogger<GenericReposi
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Error getting entity from the collection");
+            logger.LogError(e, "Error getting entity from the collection\n");
             throw;
         }
         finally
         {
             stopwatch.Stop();
             logger.LogInformation(
-                "GetByIdAsync took {ElapsedMilliseconds} ms ",
+                "GetByIdAsync took {ElapsedMilliseconds} ms \n",
                 stopwatch.ElapsedMilliseconds
             );
         }
@@ -66,10 +66,10 @@ public class GenericRepository<T>(IMongoDatabase database, ILogger<GenericReposi
         var stopwatch = Stopwatch.StartNew();
         if (entity == null)
         {
-            logger.LogError($"Entity is null - cannot create {nameof(entity)}");
+            logger.LogError($"Entity is null - cannot create {nameof(entity)}\n");
             throw new ArgumentNullException(
                 nameof(entity),
-                $"{nameof(entity)} is null - cannot create {nameof(entity)}"
+                $"{nameof(entity)} is null - cannot create {nameof(entity)}\n"
             );
         }
 
@@ -79,14 +79,14 @@ public class GenericRepository<T>(IMongoDatabase database, ILogger<GenericReposi
         }
         catch (MongoWriteException e)
         {
-            logger.LogError(e, "Error writing entity to the collection");
+            logger.LogError(e, "Error writing entity to the collection\n");
             throw;
         }
         finally
         {
             stopwatch.Stop();
             logger.LogInformation(
-                "CreateAsync took {ElapsedMilliseconds} ms ",
+                "CreateAsync took {ElapsedMilliseconds} ms \n",
                 stopwatch.ElapsedMilliseconds
             );
         }
@@ -97,14 +97,14 @@ public class GenericRepository<T>(IMongoDatabase database, ILogger<GenericReposi
         var stopwatch = Stopwatch.StartNew();
         if (id == Guid.Empty)
         {
-            throw new ArgumentNullException(nameof(id), "Id is  empty - cannot update entity");
+            throw new ArgumentNullException(nameof(id), "Id is empty - cannot update entity\n");
         }
 
         if (entity == null)
         {
             throw new ArgumentNullException(
                 nameof(entity),
-                "Entity is null - cannot update entity"
+                $"Entity is null - cannot update {nameof(entity)}\n"
             );
         }
 
@@ -114,14 +114,14 @@ public class GenericRepository<T>(IMongoDatabase database, ILogger<GenericReposi
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Error updating entity in the collection");
+            logger.LogError(e, "Error updating entity in the collection\n");
             throw;
         }
         finally
         {
             stopwatch.Stop();
             logger.LogInformation(
-                "UpdateAsync took {ElapsedMilliseconds} ms ",
+                "UpdateAsync took {ElapsedMilliseconds} ms \n",
                 stopwatch.ElapsedMilliseconds
             );
         }
@@ -132,7 +132,7 @@ public class GenericRepository<T>(IMongoDatabase database, ILogger<GenericReposi
         var stopwatch = Stopwatch.StartNew();
         if (id == Guid.Empty)
         {
-            throw new ArgumentNullException(nameof(id), "Id is empty - cannot delete entity");
+            throw new ArgumentNullException(nameof(id), "Id is empty - cannot delete entity\n");
         }
 
         try
@@ -141,14 +141,14 @@ public class GenericRepository<T>(IMongoDatabase database, ILogger<GenericReposi
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Error deleting entity from the collection");
+            logger.LogError(e, "Error deleting entity from the collection\n");
             throw;
         }
         finally
         {
             stopwatch.Stop();
             logger.LogInformation(
-                "DeleteAsync took {ElapsedMilliseconds} ms ",
+                "DeleteAsync took {ElapsedMilliseconds} ms \n",
                 stopwatch.ElapsedMilliseconds
             );
         }

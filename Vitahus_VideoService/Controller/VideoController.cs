@@ -16,14 +16,13 @@ namespace Vitahus_VideoService.Controller;
     {
        
         // GET: api/Video
-        [HttpGet]
-        [Route("GetAllVideos")]
+        [HttpGet("getall")]
         public async Task<ActionResult<IEnumerable<Video>>> GetVideos()
         {
             if (env.IsDevelopment())
             {
-            logger.LogInformation("Getting all videos");
-            return Ok(await videoService.GetVideosAsync());
+                logger.LogInformation("Getting all videos");
+                return Ok(await videoService.GetVideosAsync());
             }
 
             return BadRequest("Unauthorized");
@@ -38,12 +37,25 @@ namespace Vitahus_VideoService.Controller;
             return Ok(video);
         }
 
-        [HttpPost]
-        [Route("create")]
-        public async Task<ActionResult<Video>> PostVideo(Video video)
+        [HttpPost("create")]
+        public async Task<ActionResult<Video>> PostVideo([FromBody] Video video)
         {
-            await videoService.AddVideoAsync(video);
+            if (video == null)
+            {
+                logger.LogError("Received null video object.");
+                return BadRequest("Video object is null.");
+            }
 
+            // Log video information for debugging
+            logger.LogInformation("Creating video with Title: {Title}", video.Title);
+    
+            // Generer et ID for videoen, hvis det ikke er sat
+            video.Id = Guid.NewGuid(); 
+
+            // Tilføj video til databasen
+            await videoService.AddVideoAsync(video);
+    
+            // Returner den nyskabte video
             return CreatedAtAction("GetVideo", new { id = video.Id }, video);
         }
 
