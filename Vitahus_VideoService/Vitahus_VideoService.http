@@ -1,6 +1,6 @@
 @Vitahus_VideoService_HostAddress = https://localhost:5001
 
-GET {{Vitahus_VideoService_HostAddress}}/api/video/getallvideos
+GET {{Vitahus_VideoService_HostAddress}}/api/video/getall
 Accept: application/json
 
 ###
