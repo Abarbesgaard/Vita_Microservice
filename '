@@ -71,12 +71,7 @@ public class AuditLogConsumer : BackgroundService
                 _channel?.BasicNack(ea.DeliveryTag, false, true);
             }
         };
-
-        _channel.BasicConsume(
-            queue: "auditLogQueue",
-            autoAck: false,
-            consumer: consumer);
-
+        _channel.BasicConsume(queue: "auditLogQueue", autoAck: false, consumer: consumer);
         await Task.CompletedTask;
     }
 

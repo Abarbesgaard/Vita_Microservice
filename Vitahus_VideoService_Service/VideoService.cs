@@ -1,22 +1,24 @@
+using System.Diagnostics;
+using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
-using MongoDB.Driver;
 using Vitahus_VideoService_Repository;
 using Vitahus_VideoService_Service.RabbitMQ;
 using Vitahus_VideoService_Shared;
 
 namespace Vitahus_VideoService_Service;
 
-public class VideoService(IGenericRepository<Video> videoCollection, IRabbitMQService rabbitMQService, ILogger<VideoService> logger) : IVideoService
+public record VideoMessage(Guid VideoId, string Operation, DateTimeOffset Timestamp);
 
+public class VideoService(
+    IGenericRepository<Video> videoCollection,
+    IRabbitMQService rabbitMqService,
+    ILogger<VideoService> logger
+) : IVideoService
 {
-    private readonly IGenericRepository<Video> _videoCollection = videoCollection;
-    private readonly IRabbitMQService _rabbitMQService = rabbitMQService;
-    private readonly ILogger<VideoService> _logger = logger;
     public async Task<Video?> GetVideoAsync(Guid videoId)
     {
-        Console.WriteLine($"Starter GetVideoAsync metoden med videoId: {videoId}");
-
+        logger.LogInformation($"Starter GetVideoAsync metoden med videoId: {videoId}\n");
         var auditLog = new AuditLog
         {
             UserId = Guid.NewGuid(),
@@ -25,32 +27,45 @@ public class VideoService(IGenericRepository<Video> videoCollection, IRabbitMQSe
             DocumentId = videoId,
             Timestamp = DateTimeOffset.UtcNow
         };
-        Console.WriteLine($"AuditLog oprettet: {auditLog.ToJson()}");
+        logger.LogInformation($"AuditLog oprettet: {auditLog.ToJson()}\n");
+        var videoMessage = new VideoMessage(
+            VideoId: videoId,
+            Operation: "GetById",
+            Timestamp: DateTimeOffset.UtcNow
+        );
 
         var auditLogMessage = auditLog.ToJson();
-        Console.WriteLine($"AuditLog konverteret til JSON: {auditLogMessage}");
+        logger.LogInformation($"AuditLog konverteret til JSON: {auditLogMessage}\n");
 
         try
         {
-            Console.WriteLine("Forsøger at sende auditLog besked til MQ...");
-            _rabbitMQService.SendMessage("auditLogQueue", auditLogMessage);
-            Console.WriteLine("AuditLog besked sendt til MQ");
+            logger.LogInformation("Forsøger at sende auditLog besked til MQ...\n");
+            rabbitMqService.SendMessage("auditLogQueue", auditLogMessage);
+            var videoMessageJson = JsonSerializer.Serialize(videoMessage);
+            rabbitMqService.SendMessage("videoQueue", videoMessageJson);
+            var stopwatch = Stopwatch.StartNew();
+            await Task.Delay(1000 + new Random().Next(3000));
+            stopwatch.Stop();
+            logger.LogInformation(
+                $"[TIME] AuditLog besked sendt til MQ efter {stopwatch.ElapsedMilliseconds} ms\n"
+            );
+            logger.LogInformation("AuditLog besked sendt til MQ\n");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Fejl ved afsendelse af auditLog besked: {ex.Message}");
+            logger.LogError($"Fejl ved afsendelse af auditLog besked: {ex.Message}\n");
         }
 
-        Console.WriteLine($"Henter video med ID: {videoId} fra databasen...");
-        var video = await _videoCollection.GetByIdAsync(videoId);
-        
+        logger.LogInformation($"Henter video med ID: {videoId} fra databasen...\n");
+        var video = await videoCollection.GetByIdAsync(videoId);
+
         if (video != null)
         {
-            Console.WriteLine($"Video fundet: {video.ToJson()}");
+            logger.LogInformation($"Video fundet: {video.ToJson()}\n");
         }
         else
         {
-            Console.WriteLine("Ingen video fundet med det givne ID");
+            logger.LogInformation("Ingen video fundet med det givne ID\n");
         }
 
         return video;
@@ -58,37 +73,49 @@ public class VideoService(IGenericRepository<Video> videoCollection, IRabbitMQSe
 
     public async Task<IEnumerable<Video>> GetVideosAsync()
     {
-       var result = await _videoCollection.GetAllAsync();
+        logger.LogInformation("Starter GetVideosAsync metoden\n");
+        var result = await videoCollection.GetAllAsync();
+        var videoMessage = new VideoMessage(
+            VideoId: Guid.NewGuid(),
+            Operation: "GetAll",
+            Timestamp: DateTimeOffset.UtcNow
+        );
+        var auditLog = new AuditLog
+        {
+            UserId = Guid.NewGuid(),
+            Operation = "GetAll",
+            Collection = "Video",
+            DocumentId = Guid.NewGuid(),
+            Timestamp = DateTimeOffset.UtcNow
+        };
+        var auditLogMessage = auditLog.ToJson();
+        logger.LogInformation($"AuditLog konverteret til JSON: {auditLogMessage}\n");
+        rabbitMqService.SendMessage("auditLogQueue", auditLogMessage);
+        var videoMessageJson = JsonSerializer.Serialize(videoMessage);
+        logger.LogInformation($"VideoMessage konverteret til JSON: {videoMessageJson}\n");
+        rabbitMqService.SendMessage("videoQueue", videoMessageJson);
 
-    var auditLog = new AuditLog
-    {
-        UserId = Guid.NewGuid(),
-        Operation = "GetAll",
-        Collection = "Video",
-        DocumentId = Guid.NewGuid(),
-        Timestamp = DateTimeOffset.UtcNow
-    };
-    var auditLogMessage = auditLog.ToJson();
-    _rabbitMQService.SendMessage("auditLogQueue", auditLogMessage);
-    
-    return result;
+        return result;
     }
 
     public async Task AddVideoAsync(Video video)
     {
         logger.LogInformation($"[>] Starter AddVideoAsync metoden med video: {video.ToJson()}\n");
-        
+
+        // Simulerer en større opgave ved at tilføje en tilfældig ventetid
+        await Task.Delay(1000 + new Random().Next(2000));
+
         var videoMessage = video.ToJson();
         logger.LogInformation($"[o] Video konverteret til JSON: {videoMessage}\n");
-        
+
         try
         {
             logger.LogInformation("[>] Forsøger at sende video besked til MQ...\n");
-            _rabbitMQService.SendMessage("videoQueue", videoMessage);
+            rabbitMqService.SendMessage("videoQueue", videoMessage);
             logger.LogInformation($"[>] Video besked sendt til MQ: {videoMessage}\n");
-            
+
             logger.LogInformation("Forsøger at gemme video i databasen...\n");
-            await _videoCollection.CreateAsync(video)!;
+            await videoCollection.CreateAsync(video)!;
             logger.LogInformation($"Video gemt i databasen med ID: {video.Id}\n");
 
             var auditLog = new AuditLog
@@ -102,7 +129,7 @@ public class VideoService(IGenericRepository<Video> videoCollection, IRabbitMQSe
             logger.LogInformation($"AuditLog oprettet: {auditLog.ToJson()}\n");
             var auditLogMessage = auditLog.ToJson();
             logger.LogInformation("Forsøger at sende auditLog besked til MQ...\n");
-            _rabbitMQService.SendMessage("auditLogQueue", auditLogMessage);
+            rabbitMqService.SendMessage("auditLogQueue", auditLogMessage);
             logger.LogInformation($"AuditLog besked sendt til MQ: {auditLogMessage}\n");
         }
         catch (Exception ex)
@@ -119,7 +146,7 @@ public class VideoService(IGenericRepository<Video> videoCollection, IRabbitMQSe
 
     public async Task UpdateVideoAsync(Video video)
     {
-        await _videoCollection.UpdateAsync(video.Id, video);
+        await videoCollection.UpdateAsync(video.Id, video);
         var auditLog = new AuditLog
         {
             UserId = video.UserId,
@@ -129,12 +156,12 @@ public class VideoService(IGenericRepository<Video> videoCollection, IRabbitMQSe
             Timestamp = DateTimeOffset.UtcNow
         };
         var auditLogMessage = auditLog.ToJson();
-        _rabbitMQService.SendMessage("auditLogQueue", auditLogMessage);
+        rabbitMqService.SendMessage("auditLogQueue", auditLogMessage);
     }
 
     public async Task DeleteVideoAsync(Video? video)
     {
-        await _videoCollection.DeleteAsync(video!.Id);
+        await videoCollection.DeleteAsync(video!.Id);
         var auditLog = new AuditLog
         {
             UserId = video.UserId,
@@ -144,6 +171,7 @@ public class VideoService(IGenericRepository<Video> videoCollection, IRabbitMQSe
             Timestamp = DateTimeOffset.UtcNow
         };
         var auditLogMessage = auditLog.ToJson();
-        _rabbitMQService.SendMessage("auditLogQueue", auditLogMessage);
+        rabbitMqService.SendMessage("auditLogQueue", auditLogMessage);
     }
 }
+

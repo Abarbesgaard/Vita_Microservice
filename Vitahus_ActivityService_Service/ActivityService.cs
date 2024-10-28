@@ -5,20 +5,19 @@ using Microsoft.Extensions.Logging;
 
 namespace Vitahus_ActivityService_Service;
 
-public class ActivityService(IMapper mapper, IGenericRepository<Activity> activityRepository, IAuditLogService auditLogService, ILogger<ActivityService> logger) : IActivityService
+public class ActivityService(
+    IMapper mapper,
+    IGenericRepository<Activity> activityRepository,
+    IAuditLogService auditLogService,
+    ILogger<ActivityService> logger)
+    : IActivityService
 {
-    private readonly IMapper _mapper = mapper;
-    private readonly IGenericRepository<Activity> _activityRepository = activityRepository;
-    private readonly IAuditLogService _auditLogService = auditLogService;
-
-    private readonly ILogger<ActivityService> _logger = logger;
-
     public async Task<Activity> CreateActivityAsync(Activity activityDto)
     {
-        _logger.LogInformation("Creating activity");
-        var activity = _mapper.Map<Activity>(activityDto);
-        await _activityRepository.CreateAsync(activity)!;
-        await _auditLogService.LogAsync(new AuditLog
+        logger.LogInformation("Creating activity");
+        var activity = mapper.Map<Activity>(activityDto);
+        await activityRepository.CreateAsync(activity)!;
+        await auditLogService.LogAsync(new AuditLog
         {
             UserId = Guid.NewGuid(),
             Operation = "Create",
@@ -31,8 +30,8 @@ public class ActivityService(IMapper mapper, IGenericRepository<Activity> activi
 
     public async Task<Activity> GetByIdAsync(Guid activityId)
     {
-        _logger.LogInformation("Getting activity by ID: {ActivityId}", activityId);
-        await _auditLogService.LogAsync(new AuditLog
+        logger.LogInformation("Getting activity by ID: {ActivityId}", activityId);
+        await auditLogService.LogAsync(new AuditLog
         {
             UserId = Guid.NewGuid(),
             Operation = "GetById",
@@ -41,13 +40,13 @@ public class ActivityService(IMapper mapper, IGenericRepository<Activity> activi
             Timestamp = DateTimeOffset.Now
         });
 
-        return await _activityRepository?.GetByIdAsync(activityId)! ?? throw new Exception("Activity not found");
+        return await activityRepository?.GetByIdAsync(activityId)! ?? throw new Exception("Activity not found");
     }
 
     public async Task<IEnumerable<Activity>> GetAllAsync()
     {
-        _logger.LogInformation("Getting all activities");
-        await _auditLogService.LogAsync(new AuditLog
+        logger.LogInformation("Getting all activities");
+        await auditLogService.LogAsync(new AuditLog
         {
             UserId = Guid.NewGuid(),
             Operation = "GetAll",
@@ -56,23 +55,23 @@ public class ActivityService(IMapper mapper, IGenericRepository<Activity> activi
             Timestamp = DateTimeOffset.Now
         });
 
-        return await _activityRepository.GetAllAsync() ?? throw new Exception("No activities found");
+        return await activityRepository.GetAllAsync() ?? throw new Exception("No activities found");
     }
 
     public async Task<Activity> UpdateActivityAsync(Guid activityId, Activity activityDto)
     {
-        _logger.LogInformation("Updating activity with ID: {ActivityId}", activityId);
-        var activity = await _activityRepository.GetByIdAsync(activityId);
+        logger.LogInformation("Updating activity with ID: {ActivityId}", activityId);
+        var activity = await activityRepository.GetByIdAsync(activityId);
         if (activity == null)
         {
-            _logger.LogError("Activity not found");
+            logger.LogError("Activity not found");
             throw new Exception("Activity not found");
         }
 
-        _mapper.Map(activityDto, activity);
-        await _activityRepository.UpdateAsync(activityId, activity);
-        _logger.LogInformation("Activity updated successfully");
-        await _auditLogService.LogAsync(new AuditLog
+        mapper.Map(activityDto, activity);
+        await activityRepository.UpdateAsync(activityId, activity);
+        logger.LogInformation("Activity updated successfully");
+        await auditLogService.LogAsync(new AuditLog
         {
             UserId = Guid.NewGuid(),
             Operation = "Update",
@@ -85,17 +84,17 @@ public class ActivityService(IMapper mapper, IGenericRepository<Activity> activi
 
     public async Task DeleteActivityAsync(Guid activityId)
     {
-        _logger.LogInformation("Deleting activity with ID: {ActivityId}", activityId);
-        var activity = await _activityRepository.GetByIdAsync(activityId);
+        logger.LogInformation("Deleting activity with ID: {ActivityId}", activityId);
+        var activity = await activityRepository.GetByIdAsync(activityId);
         if (activity == null)
         {
-            _logger.LogError("Activity not found");
+            logger.LogError("Activity not found");
             throw new Exception("Activity not found");
         }
 
-        await _activityRepository.DeleteAsync(activityId);
-        _logger.LogInformation("Activity deleted successfully");
-        await _auditLogService.LogAsync(new AuditLog
+        await activityRepository.DeleteAsync(activityId);
+        logger.LogInformation("Activity deleted successfully");
+        await auditLogService.LogAsync(new AuditLog
         {
             UserId = Guid.NewGuid(),
             Operation = "Delete",

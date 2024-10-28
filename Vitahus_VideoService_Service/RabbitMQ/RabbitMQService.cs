@@ -1,6 +1,7 @@
+using System.Text;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
-using System.Text;
+
 namespace Vitahus_VideoService_Service.RabbitMQ;
 public interface IRabbitMQService
 {
@@ -11,12 +12,12 @@ public class RabbitMQService : IRabbitMQService
     private readonly IConnectionFactory _connectionFactory;
     private IConnection? _connection;
     private IModel? _channel;
-
     private readonly ILogger<RabbitMQService>? _logger;
 
     public RabbitMQService(IConnectionFactory connectionFactory, ILogger<RabbitMQService> logger)
     {
         _connectionFactory = connectionFactory;
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         CreateConnection();
     }
 
@@ -40,10 +41,11 @@ public class RabbitMQService : IRabbitMQService
             EnsureConnection();
 
             _channel?.QueueDeclare(queue: queueName, durable: true, exclusive: false, autoDelete: false, arguments: null);
-
+            
+            _channel?.ExchangeDeclare("directLogging", ExchangeType.Direct);
             var body = Encoding.UTF8.GetBytes(message);
-
-            _channel?.BasicPublish(exchange: "", routingKey: queueName, basicProperties: null, body: body);
+            _channel?.QueueBind(queue: queueName, exchange: "directLogging", routingKey: queueName);
+            _channel?.BasicPublish(exchange: "directLogging", routingKey: queueName, basicProperties: null, body: body);
             _logger?.LogInformation($"Sendt besked til {queueName}: {message}\n");
             return true;
         }
@@ -56,7 +58,7 @@ public class RabbitMQService : IRabbitMQService
 
     private void EnsureConnection()
     {
-        if (_connection == null || !_connection.IsOpen)
+        if (_connection is not { IsOpen: true })
         {
             CreateConnection();
         }

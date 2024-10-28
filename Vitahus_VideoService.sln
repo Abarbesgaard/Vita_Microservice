@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vitahus_ActivityService_Sha
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vitahus_ActivityService_Data", "Vitahus_ActivityService_Data\Vitahus_ActivityService_Data.csproj", "{148A355B-7A81-4C18-ADA4-FD1AF29B6C5C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp1", "ConsoleApp1\ConsoleApp1.csproj", "{9203CCC3-7806-4BA1-BEF0-66139E7ECA72}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -72,5 +74,9 @@ Global
 		{148A355B-7A81-4C18-ADA4-FD1AF29B6C5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{148A355B-7A81-4C18-ADA4-FD1AF29B6C5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{148A355B-7A81-4C18-ADA4-FD1AF29B6C5C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9203CCC3-7806-4BA1-BEF0-66139E7ECA72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9203CCC3-7806-4BA1-BEF0-66139E7ECA72}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9203CCC3-7806-4BA1-BEF0-66139E7ECA72}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9203CCC3-7806-4BA1-BEF0-66139E7ECA72}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
