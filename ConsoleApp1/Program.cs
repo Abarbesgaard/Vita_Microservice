@@ -28,10 +28,10 @@ public class Program
             ServerCertificateCustomValidationCallback = (message, cert, chain, sslPolicyErrors) => true
         };
 
-        // Create an instance of HttpClient using the handler
+        // Create an instance of HttpClient using the handle
         using (var httpClient = new HttpClient(handler))
         {
-            // Loop to make the API calls
+            // Loop to make the API calls 
             var tasks = new Task[numberOfCalls];
             for (var i = 0; i < numberOfCalls; i++)
             {

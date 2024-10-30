@@ -5,8 +5,8 @@ using Vitahus_ActivityService_Shared;
 namespace Vitahus_ActivityService.Controller;
 
 public class ActivityController(
-    IActivityService activityService, 
-    ILogger<ActivityController> logger) 
+    IActivityService activityService,
+    ILogger<ActivityController> logger)
 : ControllerBase
 {
     private readonly IActivityService _activityService = activityService;
@@ -24,7 +24,7 @@ public class ActivityController(
     {
         logger.LogInformation("Getting all activities");
         var activities = await _activityService.GetAllAsync();
-        logger.LogInformation("Activities: {Activities}", activities);  
+        logger.LogInformation("Activities: {Activities}", activities);
         return Ok(activities);
     }
 
