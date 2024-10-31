@@ -17,7 +17,23 @@ internal class Program
     {
         var builder = WebApplication.CreateBuilder(args);
         builder.Services.AddHttpForwarder();
-
+        services.AddRateLimiter(options =>
+            {
+                options.AddFixedWindowLimiter("customRateLimitingPolicy", opt =>
+                {
+                    opt.PermitLimit = 4;
+                    opt.Window = TimeSpan.FromSeconds(12);
+                    opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+                    opt.QueueLimit = 2;
+                });
+            });
+        builder.services.AddOutputCache(options => 
+            {
+            options.AddPolicy("customCachingPolicy", builder =>
+                {
+                builder.Expire(TimeSpan.FromSeconds(20));
+                });
+            });
         var app = builder.Build();
 
         var httpClient = new HttpMessageInvoker(
@@ -66,8 +82,13 @@ internal class Program
             .CreateBuilder(args)
             .Services.AddReverseProxy()
             .LoadFromConfig(
-                WebApplication.CreateBuilder(args).Configuration.GetSection("ReverseProxy")
+                WebApplication
+                  .CreateBuilder(args)
+                  .Configuration
+                  .GetSection("ReverseProxy")
             );
+        app.UseOutputCache();
+        app.UseRateLimiter();
         app.MapReverseProxy();
 
         app.Run();
